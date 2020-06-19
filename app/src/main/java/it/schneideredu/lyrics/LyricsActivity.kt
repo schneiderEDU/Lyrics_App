@@ -5,7 +5,7 @@
     Version: 0.1
     Author: Christian Schneider (https://github.com/schneiderEDU)
     Description: Stage 1 - Basic App (without any design patterns)
-    Perquisites: basics in procedural programming, basic understanding of oop
+    Prerequisites: basics in procedural programming, basic understanding of oop
     Learning:
         - data classes: creating data classes with attributes
         - lists: creating lists from objects
