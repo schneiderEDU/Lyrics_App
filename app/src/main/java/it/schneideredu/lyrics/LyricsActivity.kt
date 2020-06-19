@@ -2,18 +2,14 @@
     App Name: Lyrics
     File Name: LyricsActivity.kt
     Build Time: 19.06.2020 - 12:08
-    Version: 0.1
+    Version: 0.2
     Author: Christian Schneider (https://github.com/schneiderEDU)
-    Description: Stage 1 - Basic App (without any design patterns)
+    Description: Stage 2 - Basic App with data binding
     Prerequisites: basics in procedural programming, basic understanding of oop
     Learning:
-        - data classes: creating data classes with attributes
-        - lists: creating lists from objects
-        - text views: setting text programmatically
-        - buttons: setting onClick listeners
+        - data binding : implement data binding in layout xml and LyricsActivity; get rid of findViewById
      Additional Information:
-        Please have a look at both build.gradle files and compare them to your generated build.gradle files from Android Studio.
-        Also have a look at the comments in every ktx file (there only 2) in the project.
+        Please have also a look at the layout file xml. There are some significant changes in order to use data binding
  */
 package it.schneideredu.lyrics
 
@@ -23,20 +19,17 @@ import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import it.schneideredu.lyrics.data.Lyric
+import it.schneideredu.lyrics.databinding.ActivityLyricsBinding
+import kotlinx.android.synthetic.main.activity_lyrics.*
 
 class LyricsActivity : AppCompatActivity() {
     /*
         Private attributes for the LyricsActivity class. These are only accessible within this class (due to the keyword private)
             index - Variable of type Int; used to get a specific item from lyricsList
             lyricsList - (immutable) List of Lyric objects; used at the moment to store our data; will be obsolete in future versions of the app, but for now it is required
-            txt* - TextView objects; store the references to the TextViews in the layout file
-            btn* - Button objects; store the references to the Buttons in the layout file
-
-        All references to the layout file cannot be instantiated at declaration due to the circumstance that the layout will be set in the onCreate() method.
-        Therefore we used the keyword lateinit to assign values later in the onCreate() method, after the layout is set.
+            binding - Object for data binding; initialized in the onCreate() method
      */
     private var index : Int = 0
     private var lyricsList : List<Lyric> = listOf<Lyric>(
@@ -65,24 +58,14 @@ class LyricsActivity : AppCompatActivity() {
         )
     )
 
-    private lateinit var txtLyric : TextView
-    private lateinit var txtArtist : TextView
-    private lateinit var txtSong : TextView
-    private lateinit var btnNext : Button
-    private lateinit var btnPrev : Button
-
+    private lateinit var binding : ActivityLyricsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_lyrics)
+        /* Initializes the binding object and replaces the stock setContentView() method */
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_lyrics)
         /* Calls the hideSystemUi() method defined at the end of this file */
         hideSystemUi()
-        /* Assigns ui elements by their id to the respective (lateinit) variables*/
-        txtLyric = findViewById(R.id.txtLyricsLine)
-        txtArtist = findViewById(R.id.txtArtist)
-        txtSong = findViewById(R.id.txtSong)
-        btnPrev = findViewById(R.id.btnPrevious)
-        btnNext = findViewById(R.id.btnNext)
         /* Calls showLyric() method to display the first list entry from the lyricsList */
         showLyric()
 
@@ -92,7 +75,7 @@ class LyricsActivity : AppCompatActivity() {
            If-Statements prevent to get exceptions by accessing list elements that doesn't exist.
            Both onClickListeners call the showLyric() method after manipulating the index value
         */
-        btnPrev.setOnClickListener {
+        btnPrevious.setOnClickListener {
             if(index > 0) {
                 index--
                 showLyric()
@@ -106,14 +89,13 @@ class LyricsActivity : AppCompatActivity() {
             }
         }
     }
+
     /*
-        Sets the TextView texts to the respective values from the current object from the lyricsList;
+        Sets the TextView texts to the respective values from the current object from the lyricsList using data binding;
         calls the showHideButton() method
      */
     private fun showLyric() {
-        txtLyric.text = lyricsList[index].lyricLine
-        txtArtist.text = lyricsList[index].artist
-        txtSong.text = lyricsList[index].song
+        binding.lyric = lyricsList[index]
         showHideButton()
     }
 
@@ -124,16 +106,16 @@ class LyricsActivity : AppCompatActivity() {
      */
     private fun showHideButton() {
         when(index) {
-            0 -> {
-                btnPrev.visibility = INVISIBLE
+            0 -> binding.apply{
+                btnPrevious.visibility = INVISIBLE
                 btnNext.visibility = if(lyricsList.size > 1) VISIBLE else INVISIBLE
             }
-            lyricsList.size - 1 -> {
-                btnPrev.visibility = if(lyricsList.size > 1) VISIBLE else INVISIBLE
+            lyricsList.size - 1 -> binding.apply{
+                btnPrevious.visibility = if(lyricsList.size > 1) VISIBLE else INVISIBLE
                 btnNext.visibility = INVISIBLE
             }
-            else -> {
-                btnPrev.visibility = VISIBLE
+            else -> binding.apply{
+                btnPrevious.visibility = VISIBLE
                 btnNext.visibility = VISIBLE
             }
         }
