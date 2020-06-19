@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Lyrics</string>
+    <string name="label_next">Next</string>
+    <string name="label_previous">Previous</string>
+</resources>
